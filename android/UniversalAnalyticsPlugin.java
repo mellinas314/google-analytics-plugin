@@ -63,7 +63,7 @@ public class UniversalAnalyticsPlugin extends CordovaPlugin {
             int length = args.length();
             if (length > 0) {
                 this.trackEvent(args.getString(0), length > 1 ? args.getString(1) : "",
-                        length > 2 ? args.getString(2) : "", length > 3 ? args.getLong(3) : false,
+                        length > 2 ? args.getString(2) : "", length > 3 ? args.getLong(3) : 0,
                         length > 4 ? args.getBoolean(4) : false, callbackContext);
             }
             return true;
