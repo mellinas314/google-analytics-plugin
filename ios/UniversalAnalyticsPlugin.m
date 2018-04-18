@@ -283,7 +283,7 @@
         if ([command.arguments count] > 3)
             value = [command.arguments objectAtIndex:3];
 
-        bool newSession = [[command argumentAtIndex:4 withDefault:@(NO)] boolValue];           
+        bool newSession = [[command argumentAtIndex:4 withDefault:@(NO)] boolValue];
 
         id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
 
@@ -296,14 +296,60 @@
                         value: value];
         if(newSession){ 
             [builder set:@"start" forKey:kGAISessionControl];
-        }                        
+        }
         [tracker send:[builder build]];
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
     }];
+}
 
+- (void) trackSocial: (CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult* pluginResult = nil;
+
+    if ( ! _trackerStarted) {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Tracker not started"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+      return;
+    }
+
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult* pluginResult = nil;
+        NSString *socialNetwork = nil;
+        NSString *socialAction = nil;
+        NSString *target = nil;
+
+        if ([command.arguments count] > 0)
+            socialNetwork = [command.arguments objectAtIndex:0];
+
+        if ([command.arguments count] > 1)
+            socialAction = [command.arguments objectAtIndex:1];
+
+        if ([command.arguments count] > 2)
+            target = [command.arguments objectAtIndex:2];
+
+        bool newSession = [[command argumentAtIndex:3 withDefault:@(NO)] boolValue];
+
+        id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+        [self addCustomDimensionsToTracker:tracker];
+
+        GAIDictionaryBuilder *builder = [GAIDictionaryBuilder
+                                createSocialWithNetwork:socialNetwork
+                                action:socialAction
+                                target:target];
+        if(newSession) {
+            [builder set:@"start" forKey:kGAISessionControl];
+        }
+        [tracker send:[builder build]];
+
+
+        [tracker send:[[GAIDictionaryBuilder createSocialWithNetwork:social_network action:social_action target:target_url] build]];
+
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
 }
 
 - (void) trackException: (CDVInvokedUrlCommand*)command

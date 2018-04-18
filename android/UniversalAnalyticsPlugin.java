@@ -20,6 +20,7 @@ public class UniversalAnalyticsPlugin extends CordovaPlugin {
     public static final String START_TRACKER = "startTrackerWithId";
     public static final String TRACK_VIEW = "trackView";
     public static final String TRACK_EVENT = "trackEvent";
+    public static final String TRACK_SOCIAL = "trackSocial";
     public static final String TRACK_EXCEPTION = "trackException";
     public static final String TRACK_TIMING = "trackTiming";
     public static final String TRACK_METRIC = "trackMetric";
@@ -62,8 +63,16 @@ public class UniversalAnalyticsPlugin extends CordovaPlugin {
             int length = args.length();
             if (length > 0) {
                 this.trackEvent(args.getString(0), length > 1 ? args.getString(1) : "",
-                        length > 2 ? args.getString(2) : "", length > 3 ? args.getLong(3) : 0,
+                        length > 2 ? args.getString(2) : "", length > 3 ? args.getLong(3) : false,
                         length > 4 ? args.getBoolean(4) : false, callbackContext);
+            }
+            return true;
+        } else if (TRACK_SOCIAL.equals(action)) {
+            int length = args.length();
+            if(length > 0) {
+                this.trackSocial(args.getString(0), length > 1 ? args.getString(1) : "",
+                        length > 2 ? args.getString(2) : "", length > 3 ? args.getLong(3) : false,
+                        callbackContext);
             }
             return true;
         } else if (TRACK_EXCEPTION.equals(action)) {
@@ -255,6 +264,39 @@ public class UniversalAnalyticsPlugin extends CordovaPlugin {
             callbackContext.success("Track Event: " + category);
         } else {
             callbackContext.error("Expected non-empty string arguments.");
+        }
+    }
+
+    private void trackSocial(String socialNetwork, String socialAction, String target, boolean newSession,
+            CallbackContext callbackContext) {
+        if (!trackerStarted) {
+            callbackContext.error("Tracker not started");
+            return;
+        }
+
+        if(socialAction==null || socialNetwork==null || target==null
+            || socialAction.equals("") || socialAction.equals("") || target.equals("")
+            || socialAction.length()==0 || socialNetwork.length()==0 || target.length()==0) {
+            callbackContext.error("Expected non-empty string arguments.");
+        }else {
+            HitBuilders.SocialBuilder hitBuilder = new HitBuilders.SocialBuilder();
+            addCustomDimensionsAndMetricsToHitBuilder(hitBuilder);
+
+            if(!newSession) {
+                tracker.send(hitBuilder
+                            .setNetwork(socialNetwork)
+                            .setAction(socialAction)
+                            .setTarget(target)
+                            .build());
+            }else {
+                tracker.send(hitBuilder
+                            .setNetwork(socialNetwork)
+                            .setAction(socialAction)
+                            .setTarget(target)
+                            .setNewSession()
+                            .build());
+            }
+            callbackContext.success("Track social enviado con exito.");
         }
     }
 

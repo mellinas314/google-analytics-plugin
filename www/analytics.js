@@ -9,7 +9,7 @@ UniversalAnalyticsPlugin.prototype.startTrackerWithId = function(id, dispatchPer
     error = success;
     success = dispatchPeriod;
     dispatchPeriod = 30;
-  }  
+  }
   cordova.exec(success, error, 'UniversalAnalytics', 'startTrackerWithId', [id, dispatchPeriod]);
 };
 
@@ -51,24 +51,7 @@ UniversalAnalyticsPlugin.prototype.debugMode = function(success, error) {
 };
 
 UniversalAnalyticsPlugin.prototype.trackMetric = function(key, value, success, error) {
-  // as key was formerly documented to be of type string, 
-  // we need to at least accept string formatted numbers and pass the converted number
-  var numberKey = key;
-  if (typeof key === "string") {
-    numberKey = Number.parseInt(key);
-    if (isNaN(numberKey)) {
-      throw Error("key must be a valid integer or string formatted integer");
-    }
-  }
-
-  // as value was formerly documented to be of type string
-  // and therefore platform implementations expect value parameter of type string,
-  // we need to cast the value parameter to string - although gathered metrics are infact number types.
-  var stringValue = value || "";
-  if (typeof stringValue !== "string") {
-    stringValue = String(value);
-  }
-  cordova.exec(success, error, 'UniversalAnalytics', 'trackMetric', [numberKey, stringValue]);
+  cordova.exec(success, error, 'UniversalAnalytics', 'trackMetric', [key, value]);
 };
 
 UniversalAnalyticsPlugin.prototype.trackView = function(screen, campaignUrl, newSession, success, error) {
@@ -78,7 +61,7 @@ UniversalAnalyticsPlugin.prototype.trackView = function(screen, campaignUrl, new
 
   if (typeof newSession === 'undefined' || newSession === null) {
     newSession = false;
-  }  
+  }
 
   cordova.exec(success, error, 'UniversalAnalytics', 'trackView', [screen, campaignUrl, newSession]);
 };
@@ -100,9 +83,24 @@ UniversalAnalyticsPlugin.prototype.trackEvent = function(category, action, label
 
   if (typeof newSession === 'undefined' || newSession === null) {
     newSession = false;
-  }    
+  }
 
   cordova.exec(success, error, 'UniversalAnalytics', 'trackEvent', [category, action, label, value, newSession]);
+};
+
+UniversalAnalyticsPlugin.prototype.trackSocial = function(social_network, social_action, target, newSession, success, error) {
+  if (typeof social_action === 'undefined' || social_action === null) {
+    social_action = '';
+  }
+  if (typeof target === 'undefined' || target === null) {
+    target = 0;
+  }
+
+  if (typeof newSession === 'undefined' || newSession === null) {
+    newSession = false;
+  }
+
+  cordova.exec(success, error, 'UniversalAnalytics', 'trackSocial', [social_network, social_action, target, newSession]);
 };
 
 /**
