@@ -24,7 +24,7 @@
 
         if ([dispatchPeriod isKindOfClass:[NSNumber class]])
             [GAI sharedInstance].dispatchInterval = [dispatchPeriod doubleValue];
-        else 
+        else
             [GAI sharedInstance].dispatchInterval = 30;
 
         [[GAI sharedInstance] trackerWithTrackingId:accountId];
@@ -44,7 +44,7 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-    
+
     id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
     tracker.allowIDFACollection = [[command argumentAtIndex:0 withDefault:@(NO)] boolValue];
 
@@ -78,13 +78,13 @@
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             return;
         }
-        
+
         id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
         NSString* parameterName = [command.arguments objectAtIndex:0];
-        NSString* result = [tracker get:parameterName];   
+        NSString* result = [tracker get:parameterName];
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];             
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
@@ -97,14 +97,14 @@
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             return;
         }
-        
+
         id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-        NSString* parameterName = [command.arguments objectAtIndex:0];        
+        NSString* parameterName = [command.arguments objectAtIndex:0];
         NSString* parameter = [command.arguments objectAtIndex:1];
-        [tracker set:parameterName value:parameter]; 
+        [tracker set:parameterName value:parameter];
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];             
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
@@ -218,7 +218,7 @@
     }
 
     _customDimensions[key.stringValue] = value;
-    
+
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -294,7 +294,7 @@
                         action: action //required
                         label: label
                         value: value];
-        if(newSession){ 
+        if(newSession){
             [builder set:@"start" forKey:kGAISessionControl];
         }
         [tracker send:[builder build]];
@@ -343,9 +343,6 @@
             [builder set:@"start" forKey:kGAISessionControl];
         }
         [tracker send:[builder build]];
-
-
-        [tracker send:[[GAIDictionaryBuilder createSocialWithNetwork:social_network action:social_action target:target_url] build]];
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -407,19 +404,19 @@
 
         NSString* deepLinkUrl = [command.arguments objectAtIndex:1];
         GAIDictionaryBuilder* openParams = [[GAIDictionaryBuilder alloc] init];
-    
+
         if (deepLinkUrl && deepLinkUrl != (NSString *)[NSNull null]) {
             [[openParams setCampaignParametersFromUrl:deepLinkUrl] build];
         }
 
         bool newSession = [[command argumentAtIndex:2 withDefault:@(NO)] boolValue];
-        if(newSession){            
+        if(newSession){
             [openParams set:@"start" forKey:kGAISessionControl];
-        }        
+        }
 
         NSDictionary *hitParamsDict = [openParams build];
 
-        [tracker set:kGAIScreenName value:screenName];   
+        [tracker set:kGAIScreenName value:screenName];
         [tracker send:[[[GAIDictionaryBuilder createScreenView] setAll:hitParamsDict] build]];
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
